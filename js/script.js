@@ -115,24 +115,45 @@ function goToSlide(index) {
 nextBtn.addEventListener('click', nextSlide);
 prevBtn.addEventListener('click', prevSlide);
 
-// Auto-play carousel
-let autoplayInterval = setInterval(nextSlide, 5000);
+// Auto-play carousel with motion sensitivity check
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let autoplayInterval = null;
+
+if (!prefersReducedMotion) {
+    autoplayInterval = setInterval(nextSlide, 5000);
+}
 
 // Pause autoplay on hover
 galleryContainer.addEventListener('mouseenter', () => {
-    clearInterval(autoplayInterval);
+    if (autoplayInterval) {
+        clearInterval(autoplayInterval);
+    }
 });
 
 galleryContainer.addEventListener('mouseleave', () => {
-    autoplayInterval = setInterval(nextSlide, 5000);
+    if (!prefersReducedMotion) {
+        autoplayInterval = setInterval(nextSlide, 5000);
+    }
 });
 
-// Keyboard navigation for gallery
+// Keyboard navigation for gallery - only when gallery is in view or focused
+let galleryIsInView = false;
+const galleryObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        galleryIsInView = entry.isIntersecting;
+    });
+}, { threshold: 0.5 });
+
+galleryObserver.observe(galleryContainer);
+
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') {
-        prevSlide();
-    } else if (e.key === 'ArrowRight') {
-        nextSlide();
+    // Only navigate if gallery is visible and not typing in an input
+    if (galleryIsInView && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+        if (e.key === 'ArrowLeft') {
+            prevSlide();
+        } else if (e.key === 'ArrowRight') {
+            nextSlide();
+        }
     }
 });
 
@@ -361,7 +382,9 @@ skipLink.addEventListener('blur', () => {
 document.body.insertBefore(skipLink, document.body.firstChild);
 
 // ==================== 
-// Console Welcome Message
+// Development Console Message
 // ==================== 
-console.log('%c🎯 The Classic Cut - Barbershop Website', 'font-size: 20px; font-weight: bold; color: #d4af37;');
-console.log('%cWelcome to our website! For booking inquiries, please use the form on the page.', 'font-size: 14px; color: #666;');
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    console.log('%c🎯 The Classic Cut - Barbershop Website', 'font-size: 20px; font-weight: bold; color: #d4af37;');
+    console.log('%cDevelopment mode - Welcome to our website!', 'font-size: 14px; color: #666;');
+}

@@ -395,6 +395,7 @@ ul {
     transition: var(--transition);
     position: relative;
     overflow: hidden;
+    will-change: transform;
 }
 
 .service-card::before {
@@ -406,6 +407,7 @@ ul {
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
     transition: var(--transition);
+    will-change: left;
 }
 
 .service-card:hover::before {
@@ -413,7 +415,7 @@ ul {
 }
 
 .service-card:hover {
-    transform: translateY(-10px);
+    transform: translate3d(0, -10px, 0);
     box-shadow: var(--shadow-hover);
 }
 
