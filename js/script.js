@@ -254,11 +254,18 @@ animateElements.forEach(el => {
 // ==================== 
 // Parallax Effect for Hero
 // ==================== 
+let ticking = false;
 window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const hero = document.querySelector('.hero');
-    if (hero && scrolled < hero.offsetHeight) {
-        hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+    if (!ticking) {
+        window.requestAnimationFrame(() => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (hero && scrolled < hero.offsetHeight) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+            ticking = false;
+        });
+        ticking = true;
     }
 });
 
@@ -326,20 +333,6 @@ if ('loading' in HTMLImageElement.prototype) {
     images.forEach(img => {
         img.loading = 'lazy';
     });
-} else {
-    // Fallback for browsers that don't support lazy loading
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src || img.src;
-                observer.unobserve(img);
-            }
-        });
-    });
-
-    const images = document.querySelectorAll('img');
-    images.forEach(img => imageObserver.observe(img));
 }
 
 // ==================== 
